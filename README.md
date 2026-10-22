@@ -2,16 +2,13 @@
 
 A new Flutter project.
 
-## Getting Started
+## part 2 questions
 
-This project is a starting point for a Flutter application.
+1. why is the feed in its own Provider?
+so it can be swapped out. tests and demos override `tickFeedProvider` with a fake feed (e.g. `TickFeed(failAfter: 5)` or `TickFeed(symbols: const [])`) without touching `tickerProvider`. if the feed was created inside `tickerProvider`, there'd be no way to inject a different one.
 
-A few resources to get you started if this is your first Flutter project:
+2. what does autoDispose do when the user navigates away mid-stream?
+when the last widget watching the provider is gone, riverpod cancels the stream subscription and throws away the provider's state, so the feed stops emitting. no leaked streams. when the user comes back, the provider starts from scratch: loading again, 800ms delay, old data gone.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3. what AsyncValue during the 800ms delay, and what is hasValue?
+`AsyncLoading`, and `hasValue` is `false`. nothing has been `yield`ed yet (the `delayed` runs before the first `yield`), so there's no data stored.
