@@ -18,3 +18,17 @@ error - The type 'AsyncValue<List<Tick>>' isn't exhaustively matched by the swit
 
 # 3.4
 switch arms are checked top to bottom and the first match wins. AsyncData(:final value) matches every data state, including empty and single-item lists, so if it sat above them they’d never run. specific arms go first, general ones last.
+
+## 4
+# 4.3
+
+## 4.3 refresh vs invalidate
+tapping the refresh button keeps the old rows on screen and shows a thin linear bar for about 800ms (the feed's first-yield delay). the full-screen spinner never comes back because the state still has the previous value.
+
+ref.refresh(tickerProvider.future) rebuilds the provider and returns a Future that completes when the new value arrives, so RefreshIndicator can await it. ref.invalidate(tickerProvider) just marks the provider dirty and returns void, so there is nothing to await. both keep the previous rows visible while reloading.
+
+
+# 4.4
+
+## 4.4 isRefreshing vs isReloading
+both mean "loading again while an old value or error still exists". isRefreshing is the one for an explicit refresh (ref.refresh / ref.invalidate / pull-to-refresh), isReloading is for when the provider rebuilds because something it watches changed.
